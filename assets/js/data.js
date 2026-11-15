@@ -29,8 +29,15 @@ const portfolioData = {
     linkedin: "https://www.linkedin.com/in/kenny-akinwande",
     github: "https://github.com/KennyAkinwande",
 
-    // Your CV. Replace the file in assets/documents/ and keep this path in sync.
-    resume: "assets/documents/resume.pdf",
+    // Your CV, shown on the site as pictures of each page (view only, no download button).
+    // To update it: save each page of your new CV as an image, put the images in
+    // assets/documents/resume/ and list them here in page order. See README section 5.
+    resume: "resume.html",
+    resumePages: [
+      "assets/documents/resume/resume-page-1.webp",
+      "assets/documents/resume/resume-page-2.webp",
+      "assets/documents/resume/resume-page-3.webp"
+    ],
     resumeLabel: "View CV",
 
     // Your public Formspree endpoint (safe to publish — it is not a password).
@@ -54,8 +61,9 @@ const portfolioData = {
     "measurable impact."
   ],
 
-  // Three tags that float around your photo
-  heroTags: ["Business Analysis", "Data & Process Improvement", "Project Management"],
+  // The words that form the ring around your photo, in order (clockwise from the top).
+  // The text is sized automatically so the ring always closes; four to six short phrases look best.
+  heroTags: ["Business Analysis", "Project Management", "Data & Process Improvement", "Clinical Research", "Healthcare Leadership"],
 
   // Scrolling strip of skills under the hero (taken from your competencies)
   highlights: [

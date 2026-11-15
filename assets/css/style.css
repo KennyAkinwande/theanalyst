@@ -301,8 +301,8 @@ a:hover { color: var(--accent-hover); }
 .hero__links { display: flex; gap: 1.25rem; margin-top: clamp(.6rem, 2vh, 1.4rem); list-style: none; font-size: .95rem; font-weight: 500; }
 .hero__links a { text-decoration: underline; }
 
-/* Portrait with gradient ring and floating tags */
-.portrait { position: relative; margin: 0; justify-self: center; width: min(100%, 330px, 46vh); aspect-ratio: 1; }
+/* Portrait with gradient ring, wrapped in a ring of words */
+.portrait { position: relative; margin: 0; justify-self: center; width: min(80%, 330px, 46vh); aspect-ratio: 1; }
 .portrait__ring {
   width: 100%; height: 100%; padding: 7px; border-radius: 50%;
   background: conic-gradient(from 200deg, var(--accent), var(--accent-2), var(--ring-3), var(--accent));
@@ -313,15 +313,18 @@ a:hover { color: var(--accent-hover); }
   object-fit: cover; object-position: 50% 22%;
   border: 6px solid var(--bg); background: var(--surface-2);
 }
-.portrait__tag {
-  position: absolute;
-  padding: .4rem .85rem; border-radius: 999px;
-  background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-md);
-  color: var(--accent); font-size: .8rem; font-weight: 700; white-space: nowrap;
+/* The words sit on a circle just outside the green ring. The SVG is 26% larger
+   than the photo; script.js sets the text size so the ring closes exactly.
+   Speed: change 80s below (bigger = slower). Remove the animation line to keep it still. */
+.portrait__words {
+  position: absolute; inset: -13%; width: 126%; height: 126%;
+  overflow: visible; pointer-events: none;
 }
-.portrait__tag--1 { top: 6%; right: -4%; }
-.portrait__tag--2 { top: 56%; left: -14%; color: var(--accent-2); }
-.portrait__tag--3 { bottom: 4%; right: 2%; color: var(--text); }
+.portrait__words-text {
+  font-family: var(--font-display); font-weight: 700; font-size: 16.1px; letter-spacing: .13em;
+  fill: var(--accent);
+}
+.portrait__sep { fill: var(--accent); fill-opacity: .5; }
 
 /* Skills strip */
 .marquee {
@@ -344,6 +347,40 @@ a:hover { color: var(--accent-hover); }
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0l2.6 9.4L24 12l-9.4 2.6L12 24l-2.6-9.4L0 12l9.4-2.6z'/%3E%3C/svg%3E") center / contain no-repeat;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0l2.6 9.4L24 12l-9.4 2.6L12 24l-2.6-9.4L0 12l9.4-2.6z'/%3E%3C/svg%3E") center / contain no-repeat;
 }
+
+/* CV viewer: full-screen reader opened by every "View CV" button (built by script.js),
+   and the same page pictures on resume.html */
+.cv-viewer {
+  width: 100%; max-width: none; height: 100%; max-height: none;
+  margin: 0; padding: 0; border: 0; background: transparent; color: var(--text);
+  overflow: hidden;
+}
+.cv-viewer[open] { display: flex; flex-direction: column; }
+.cv-viewer::backdrop { background: rgba(5, 31, 32, .78); }
+.cv-viewer__bar {
+  flex: none; display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: .7rem var(--gutter); background: var(--surface); border-bottom: 1px solid var(--line);
+}
+.cv-viewer__title { font-family: var(--font-display); font-weight: 700; color: var(--text); }
+.cv-viewer__meta { margin-left: .5rem; font-family: var(--font-body); font-weight: 500; font-size: .875rem; color: var(--muted); }
+.cv-viewer__tools { display: flex; align-items: center; gap: .5rem; flex: none; }
+.cv-viewer__zoom { font-size: 1.25rem; line-height: 1; font-weight: 500; }
+.cv-viewer__zoom:disabled { opacity: .4; cursor: default; }
+.cv-viewer__scroll { flex: 1 1 auto; overflow: auto; overscroll-behavior: contain; padding: 1.5rem var(--gutter) 3rem; }
+.cv-pages {
+  display: grid; gap: 1.25rem; margin-inline: auto;
+  width: calc(100% * var(--cv-zoom, 1)); max-width: calc(920px * var(--cv-zoom, 1));
+}
+.cv-page { margin: 0; background: #fff; border: 1px solid var(--line); border-radius: 6px; box-shadow: var(--shadow-md); overflow: hidden; }
+.cv-page img {
+  display: block; width: 100%; height: auto;
+  pointer-events: none; user-select: none; -webkit-user-select: none; -webkit-user-drag: none; -webkit-touch-callout: none;
+}
+html.cv-open { overflow: hidden; }
+.cv-section { padding-block: clamp(2rem, 5vw, 3.5rem) var(--section-space); }
+.cv-section__head { max-width: 920px; margin: 0 auto 1.5rem; }
+.cv-section__head h1 { font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.2rem); }
+.cv-section__head p { margin-top: .4rem; color: var(--muted); }
 
 /* Soft light that follows the mouse (added by script.js; mouse devices only).
    Change its colour with --cursor-glow, its size with width/height here. */
@@ -594,13 +631,11 @@ a:hover { color: var(--accent-hover); }
   .marquee__track { animation: marquee 45s linear infinite; }
   .marquee:hover .marquee__track { animation-play-state: paused; }
   .typed__caret { animation: blink 1s steps(1) infinite; }
-  .portrait__tag { animation: float 6s ease-in-out infinite; }
-  .portrait__tag--2 { animation-delay: -2s; }
-  .portrait__tag--3 { animation-delay: -4s; }
+  .portrait__words { animation: spin 80s linear infinite; }
+  .portrait:hover .portrait__words { animation-play-state: paused; }
 }
 @keyframes marquee { to { transform: translateX(-50%); } }
 @keyframes blink { 50% { opacity: 0; } }
-@keyframes float { 50% { transform: translateY(-6px); } }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
   .marquee__track { flex-wrap: wrap; width: auto; justify-content: center; }
@@ -647,8 +682,7 @@ a:hover { color: var(--accent-hover); }
 
 @media (max-width: 860px) {
   .hero__inner { grid-template-columns: minmax(0, 1fr); padding-block: 2rem 2.75rem; }
-  .portrait { order: -1; width: min(72vw, 260px); justify-self: start; margin-left: 1.5rem; }
-  .portrait__tag--2 { left: -10%; }
+  .portrait { order: -1; width: min(66vw, 250px); justify-self: center; margin-block: 1.75rem 1.5rem; }
   .about, .contact { grid-template-columns: minmax(0, 1fr); }
 }
 
@@ -658,7 +692,8 @@ a:hover { color: var(--accent-hover); }
   .skills, .projects, .process, .results, .case__meta { grid-template-columns: minmax(0, 1fr); }
   .stats { grid-template-columns: 1fr 1fr; }
   .hero__actions .btn { flex: 1 1 auto; }
-  .portrait__tag { font-size: .72rem; padding: .3rem .7rem; }
+  .cv-viewer__meta { display: none; }
+  .cv-viewer__title { font-size: .95rem; }
   .timeline { padding-left: 1.6rem; }
   .job::before { left: calc(-1.6rem + 1px); }
   .figures { grid-template-columns: 1fr 1fr; }
@@ -667,7 +702,7 @@ a:hover { color: var(--accent-hover); }
 }
 
 @media print {
-  .site-header, .marquee, .form, .hero__actions, .case-nav, .toc, .hero__glow, .cursor-glow, .typed__caret { display: none !important; }
+  .site-header, .marquee, .form, .hero__actions, .case-nav, .toc, .hero__glow, .cursor-glow, .typed__caret, .portrait__words { display: none !important; }
   .first-screen { min-height: 0; }
   .js .reveal { opacity: 1 !important; transform: none !important; }
 }

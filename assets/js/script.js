@@ -80,9 +80,144 @@
     var typed = $('[data-hero="typed"]');
     var phrases = typedPhrases();
     if (typed && phrases.length) typed.textContent = phrases[0];
-    $all("[data-hero-tag]").forEach(function (el) {
-      var t = (data.heroTags || [])[+el.getAttribute("data-hero-tag")];
-      if (t) el.textContent = t; else el.hidden = true;
+    renderWordRing();
+  }
+
+  /* =================================================================
+     WORD RING: the phrases in data.js (heroTags) set on a circle
+     around the photo. The text size is worked out so the last word
+     meets the first one and the ring closes exactly.
+     ================================================================= */
+  var RING_RADIUS = 216;                       // matches the circle path in index.html
+  var RING_LENGTH = 2 * Math.PI * RING_RADIUS; // one full turn, in SVG units
+  var RING_GAP = "\u00a0\u00a0\u2022\u00a0\u00a0"; // the dot between phrases
+
+  function renderWordRing() {
+    var svg = $(".portrait__words");
+    if (!svg) return;
+    var tags = (data.heroTags || []).filter(function (t) { return t && String(t).trim(); });
+    if (!tags.length) { svg.style.display = "none"; return; }
+    var tp = svg.querySelector("textPath");
+    tp.innerHTML = tags.map(function (t) {
+      return esc(String(t).toUpperCase()) + '<tspan class="portrait__sep">' + RING_GAP + "</tspan>";
+    }).join("");
+    var caption = $('[data-hero="focus"]');
+    if (caption) caption.textContent = "Focus areas: " + tags.join(", ") + ".";
+  }
+
+  function initWordRing() {
+    var svg = $(".portrait__words");
+    if (!svg || svg.style.display === "none") return;
+    var text = svg.querySelector("text");
+    var words = text.textContent, count = words.length;
+    var TRACK = 0.13;                          // preferred letter spacing, in em
+    var pen = document.createElement("canvas").getContext("2d");
+    function fit() {
+      if (!count || !pen) return;
+      // width of the letters alone, per 1px of text size (measured on a canvas in the same font)
+      var style = getComputedStyle(text);
+      pen.font = style.fontWeight + " 100px " + style.fontFamily;
+      var letters = pen.measureText(words).width / 100;
+      // letters + spacing must add up to one full turn of the circle
+      var size = Math.max(10.5, Math.min(18, RING_LENGTH / (letters + count * TRACK)));
+      var spacing = (RING_LENGTH - letters * size) / count;
+      text.style.fontSize = size.toFixed(3) + "px";
+      text.style.letterSpacing = spacing.toFixed(3) + "px";
+      // turn the ring so the first phrase sits centred at the top
+      var first = words.indexOf("\u00a0") < 0 ? count : words.indexOf("\u00a0");
+      var arc = pen.measureText(words.slice(0, first)).width / 100 * size + first * spacing;
+      text.setAttribute("transform", "rotate(" + (-(arc / RING_LENGTH) * 180).toFixed(2) + " 252 252)");
+    }
+    fit();
+    // fit again once the real font has arrived: the fallback font has different widths
+    window.addEventListener("load", fit);
+    if (document.fonts) {
+      if (document.fonts.load) document.fonts.load("700 15px " + getComputedStyle(text).fontFamily).then(fit, function () {});
+      if (document.fonts.ready) document.fonts.ready.then(fit);
+      if (document.fonts.addEventListener) document.fonts.addEventListener("loadingdone", fit);
+    }
+  }
+
+  /* =================================================================
+     BACK TO TOP: the name in the header and the footer link
+     ================================================================= */
+  function initScrollTop() {
+    $all('a[href="#top"]').forEach(function (a) {
+      a.addEventListener("click", function (e) {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+      });
+    });
+  }
+
+  /* =================================================================
+     CV VIEWER: every "View CV" button opens the CV pages as pictures
+     in a full-screen reader on the same page. There is no download
+     button and the PDF itself is not part of the site.
+     Pages are listed in data.js (profile.resumePages).
+     ================================================================= */
+  function resumePages() {
+    var list = (data && data.profile && data.profile.resumePages) || [];
+    return list.filter(Boolean).map(asset);
+  }
+  function resumePagesHtml() {
+    var pages = resumePages(), name = (data.profile && data.profile.name) || "";
+    return pages.map(function (src, i) {
+      return '<figure class="cv-page"><img src="' + esc(src) + '" alt="CV of ' + esc(name) + ", page " + (i + 1) + " of " + pages.length +
+        '" draggable="false"' + (i ? ' loading="lazy"' : "") + "></figure>";
+    }).join("");
+  }
+  function initResumeViewer() {
+    var pages = resumePages();
+    var onPage = $('[data-render="resumePages"]');      // resume.html shows the pages directly
+    if (onPage && pages.length) onPage.innerHTML = resumePagesHtml();
+    var links = $all('[data-profile-link="resume"]');
+    if (onPage) { links.forEach(function (a) { a.setAttribute("aria-current", "page"); }); return; }
+    if (!pages.length || !links.length || !window.HTMLDialogElement) return; // links then open resume.html
+
+    var dialog = null;
+    function build() {
+      dialog = document.createElement("dialog");
+      dialog.className = "cv-viewer";
+      dialog.setAttribute("aria-label", "CV");
+      dialog.innerHTML =
+        '<div class="cv-viewer__bar">' +
+          '<p class="cv-viewer__title">' + esc((data.profile && data.profile.name) || "CV") + ' <span class="cv-viewer__meta">CV, ' + pages.length + (pages.length === 1 ? " page" : " pages") + "</span></p>" +
+          '<div class="cv-viewer__tools">' +
+            '<button class="icon-btn cv-viewer__zoom" type="button" data-zoom="-1" aria-label="Zoom out" title="Zoom out">&minus;</button>' +
+            '<button class="icon-btn cv-viewer__zoom" type="button" data-zoom="1" aria-label="Zoom in" title="Zoom in">+</button>' +
+            '<button class="btn btn--outline btn--small cv-viewer__close" type="button">Close</button>' +
+          "</div>" +
+        "</div>" +
+        '<div class="cv-viewer__scroll" tabindex="0"><div class="cv-pages">' + resumePagesHtml() + "</div></div>";
+      body.appendChild(dialog);
+      dialog.querySelector(".cv-viewer__close").addEventListener("click", function () { dialog.close(); });
+      // zoom buttons: make the pages wider than the screen so small print can be read, then scroll
+      var steps = [1, 1.5, 2, 2.5], step = 0, sheet = dialog.querySelector(".cv-pages");
+      var zoomButtons = $all(".cv-viewer__zoom", dialog);
+      function setZoom(next) {
+        step = Math.max(0, Math.min(steps.length - 1, next));
+        sheet.style.setProperty("--cv-zoom", steps[step]);
+        zoomButtons.forEach(function (b) { b.disabled = (+b.getAttribute("data-zoom") < 0) ? step === 0 : step === steps.length - 1; });
+      }
+      zoomButtons.forEach(function (b) { b.addEventListener("click", function () { setZoom(step + (+b.getAttribute("data-zoom"))); }); });
+      setZoom(0);
+      dialog.addEventListener("click", function (e) {             // click beside the pages closes
+        if (e.target === dialog || e.target.classList.contains("cv-viewer__scroll") || e.target.classList.contains("cv-pages")) dialog.close();
+      });
+      dialog.addEventListener("close", function () { root.classList.remove("cv-open"); });
+      dialog.addEventListener("contextmenu", function (e) { if (e.target.closest(".cv-page")) e.preventDefault(); });
+    }
+    links.forEach(function (a) {
+      a.removeAttribute("target");
+      a.addEventListener("click", function (e) {
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
+        e.preventDefault();
+        if (!dialog) build();
+        root.classList.add("cv-open");
+        dialog.showModal();
+        dialog.querySelector(".cv-viewer__scroll").scrollTop = 0;
+      });
     });
   }
 
@@ -257,6 +392,7 @@
     window.addEventListener("resize", queue);
     window.addEventListener("load", queue);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(queue);
+    if (document.fonts && document.fonts.addEventListener) document.fonts.addEventListener("loadingdone", queue);
   }
 
   /* =================================================================
@@ -591,7 +727,10 @@
   initTheme();
   initReveal();
   initTyped();
+  initWordRing();
   initFirstScreen();
+  initScrollTop();
+  initResumeViewer();
   initCursorGlow();
   initForm();
   $all("[data-year]").forEach(function (el) { el.textContent = new Date().getFullYear(); });

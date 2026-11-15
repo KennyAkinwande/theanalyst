@@ -37,7 +37,7 @@ business-analyst-portfolio/
     │   ├── favicon-32.png, apple-touch-icon.png
     │   └── projects/           ← one cover image per project
     └── documents/
-        ├── resume.pdf          ← your CV
+        ├── resume/             ← your CV as one picture per page (resume-page-1.webp, ...)
         └── projects/           ← (empty) put project files here (xlsx, sql, pbix, pdf)
 ```
 
@@ -80,7 +80,7 @@ Almost everything is in **one file: `assets/js/data.js`**. Open it in any text e
 | What you want to change | Where |
 |---|---|
 | Name, title, tagline, short intro | `index.html`: the **HERO** section (search for `EDIT:`) |
-| Badge above your name, rotating tagline phrases, tags around your photo | `data.js` → `heroBadge`, `heroTypedPhrases`, `heroTags` |
+| Badge above your name, rotating tagline phrases, the ring of words around your photo | `data.js` → `heroBadge`, `heroTypedPhrases`, `heroTags` |
 | Scrolling skills strip under the hero | `data.js` → `highlights` |
 | Stat cards beside About (4+, 300+…) | `data.js` → `aboutStats` |
 | About text | `index.html`: the **ABOUT** section |
@@ -114,9 +114,27 @@ Almost everything is in **one file: `assets/js/data.js`**. Open it in any text e
 
 ## 5. Your CV
 
-Your CV is at `assets/documents/resume.pdf`. To update it, replace that file with your new PDF
-using the **same name**, `resume.pdf`. Every "View CV" button on the site points to it.
-(If you use a different name, update `resume:` in `data.js`.)
+Every "View CV" button opens your CV in a reader on the same page: one picture per page, with no download
+button. The PDF itself is deliberately not part of the site, so there is no file for a visitor to download or edit.
+(A visitor can still take a screenshot; nothing on a public web page can prevent that.)
+
+To update your CV:
+
+1. Save each page of the new CV as an image. In Word or Acrobat use "Export to image", or upload the PDF to a
+   free PDF-to-PNG converter. Aim for about 1,500 pixels wide so the text stays sharp.
+2. Name the images `resume-page-1.png`, `resume-page-2.png` and so on (`.png`, `.jpg` or `.webp` all work)
+   and put them in `assets/documents/resume/`, replacing the old ones.
+3. In `assets/js/data.js`, update the `resumePages` list so it names every page in order.
+4. If the number of pages or the file type changed, also update the three `<img>` lines in `resume.html`
+   (that page is the fallback shown when JavaScript is off).
+
+### The ring of words around your photo
+
+The phrases in `data.js` → `heroTags` are set in a circle around your photo and turn slowly (one full turn
+every 80 seconds; it pauses while the mouse is over the photo and stays still for visitors who ask for reduced motion).
+The text is sized automatically so the ring always closes, whatever you write; four to six short phrases look best.
+To change the speed, edit `80s` on the `.portrait__words` line in section 13 of `style.css`. To keep the ring still,
+delete that line.
 
 ## 6. Project files (Excel, SQL, Power BI, PDF)
 

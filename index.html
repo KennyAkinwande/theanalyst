@@ -62,11 +62,11 @@
   </script>
 </head>
 
-<body data-page="home">
+<body data-page="home" id="top">
   <a class="skip-link" href="#main">Skip to content</a>
 
   <!-- ============================ NAVIGATION ============================ -->
-  <header class="site-header" id="top">
+  <header class="site-header">
     <nav class="nav container" aria-label="Main">
       <a class="nav__brand" href="#top" data-profile-text="shortName">Kenny Akinwande</a>
 
@@ -78,7 +78,7 @@
           <li><a href="#skills">Skills</a></li>
           <li><a href="#projects">Projects</a></li>
           <li><a href="#contact">Contact</a></li>
-          <li><a data-profile-link="resume" href="assets/documents/resume.pdf" target="_blank" rel="noopener">View CV</a></li>
+          <li><a data-profile-link="resume" href="resume.html">View CV</a></li>
         </ul>
       </div>
 
@@ -136,7 +136,7 @@
 
           <div class="hero__actions">
             <a class="btn btn--primary" href="#projects">View Projects</a>
-            <a class="btn btn--outline" data-profile-link="resume" href="assets/documents/resume.pdf" target="_blank" rel="noopener">View CV</a>
+            <a class="btn btn--outline" data-profile-link="resume" href="resume.html">View CV</a>
           </div>
 
           <ul class="hero__links">
@@ -146,14 +146,17 @@
         </div>
 
         <figure class="portrait">
+          <!-- Ring of words around the photo. The words are set in data.js (heroTags);
+               script.js sizes them so they close into a full circle. -->
+          <svg class="portrait__words" viewBox="0 0 504 504" aria-hidden="true" focusable="false">
+            <defs><path id="portrait-words-path" d="M252,36 a216,216 0 1,1 0,432 a216,216 0 1,1 0,-432 a216,216 0 1,1 0,432 a216,216 0 1,1 0,-432"/></defs>
+            <text class="portrait__words-text"><textPath href="#portrait-words-path">BUSINESS ANALYSIS<tspan class="portrait__sep">&#160;&#160;&#8226;&#160;&#160;</tspan>PROJECT MANAGEMENT<tspan class="portrait__sep">&#160;&#160;&#8226;&#160;&#160;</tspan>DATA &amp; PROCESS IMPROVEMENT<tspan class="portrait__sep">&#160;&#160;&#8226;&#160;&#160;</tspan>CLINICAL RESEARCH<tspan class="portrait__sep">&#160;&#160;&#8226;&#160;&#160;</tspan>HEALTHCARE LEADERSHIP<tspan class="portrait__sep">&#160;&#160;&#8226;&#160;&#160;</tspan></textPath></text>
+          </svg>
           <div class="portrait__ring">
             <!-- EDIT: replace assets/images/profile.jpg to change your photo -->
             <img src="assets/images/profile.jpg" width="864" height="1080" alt="Portrait of Kenny Akinwande" fetchpriority="high">
           </div>
-          <!-- Tags are set in data.js (heroTags) -->
-          <span class="portrait__tag portrait__tag--1" data-hero-tag="0">Business Analysis</span>
-          <span class="portrait__tag portrait__tag--2" data-hero-tag="1">Data &amp; Process Improvement</span>
-          <span class="portrait__tag portrait__tag--3" data-hero-tag="2">Project Management</span>
+          <figcaption class="visually-hidden" data-hero="focus">Focus areas: Business Analysis, Project Management, Data &amp; Process Improvement, Clinical Research, Healthcare Leadership.</figcaption>
         </figure>
       </div>
     </section>
@@ -286,7 +289,7 @@
                 <dd>ON, Canada</dd>
               </div>
             </dl>
-            <a class="btn btn--primary" data-profile-link="resume" href="assets/documents/resume.pdf" target="_blank" rel="noopener">View CV</a>
+            <a class="btn btn--primary" data-profile-link="resume" href="resume.html">View CV</a>
           </div>
 
           <!-- Formspree form. The endpoint is set in assets/js/data.js (formspreeEndpoint).
