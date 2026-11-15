@@ -34,28 +34,34 @@
    2. DESIGN TOKENS: change colours here
    --------------------------------------------------------------------- */
 :root {
+  /* Brand palette (six greens). Everything below is one of these,
+     or a tint blended from them for backgrounds, borders and quiet text.
+       #051F20  #0B2B26  #163832  #235347  #8EB69B  #DAF1DE            */
+
   /* Light theme */
-  --bg: #f5f7fb;
+  --bg: #f1f9f2;            /* a lighter tint of #DAF1DE */
   --surface: #ffffff;
-  --surface-2: #eef2f9;
-  --text: #0f1729;          /* headings */
-  --text-2: #3a455b;        /* body text */
-  --muted: #5b667c;         /* secondary text */
-  --line: #e2e7f0;          /* borders */
-  --line-strong: #c9d1df;   /* input borders */
-  --accent: #2756d8;        /* clinical blue: buttons, links, highlights */
-  --accent-hover: #1d45b8;
+  --surface-2: #e6f5e9;
+  --text: #051f20;          /* headings */
+  --text-2: #163832;        /* body text */
+  --muted: #4a655c;         /* secondary text */
+  --line: #cfe5d4;          /* borders */
+  --line-strong: #8eb69b;   /* input borders */
+  --accent: #235347;        /* buttons, links, highlights */
+  --accent-hover: #163832;
   --accent-text: #ffffff;   /* text on accent */
-  --accent-soft: #e8eefc;
-  --teal: #0e9488;          /* secondary accent */
-  --teal-soft: #e0f4f1;
-  --dot: #16a34a;           /* badge status dot */
-  --danger: #c4321c;
-  --success: #0e8a6e;
-  --glow-blue: rgba(39, 86, 216, .30);
-  --glow-teal: rgba(14, 148, 136, .26);
-  --shadow-sm: 0 1px 2px rgba(15, 23, 41, .05), 0 1px 3px rgba(15, 23, 41, .04);
-  --shadow-md: 0 10px 28px -12px rgba(15, 23, 41, .18);
+  --accent-soft: #daf1de;
+  --accent-2: #3f7563;      /* second accent: #235347 blended toward #8EB69B, dark enough for text */
+  --accent-2-soft: #e9f6ec;
+  --ring-3: #8eb69b;        /* third colour in the photo ring */
+  --dot: #3f7563;           /* badge dot */
+  --danger: #b3311c;
+  --success: #235347;
+  --glow-1: rgba(35, 83, 71, .28);        /* soft colour wash, top right of the hero */
+  --glow-2: rgba(142, 182, 155, .42);     /* soft colour wash, bottom left of the hero */
+  --cursor-glow: rgba(88, 150, 120, .24); /* light that follows the mouse */
+  --shadow-sm: 0 1px 2px rgba(5, 31, 32, .05), 0 1px 3px rgba(5, 31, 32, .04);
+  --shadow-md: 0 10px 28px -12px rgba(5, 31, 32, .20);
 
   --font-display: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
   --font-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
@@ -72,25 +78,27 @@
 }
 
 [data-theme="dark"] {
-  --bg: #0a0e15;
-  --surface: #121823;
-  --surface-2: #182030;
-  --text: #edf0f6;
-  --text-2: #c5ccd9;
-  --muted: #98a2b6;
-  --line: #232c3b;
-  --line-strong: #344055;
-  --accent: #7d9cff;
-  --accent-hover: #9bb3ff;
-  --accent-text: #0a0e15;
-  --accent-soft: #172041;
-  --teal: #3fd6c4;
-  --teal-soft: #11302d;
-  --dot: #34d399;
+  --bg: #051f20;
+  --surface: #0b2b26;
+  --surface-2: #163832;
+  --text: #daf1de;
+  --text-2: #bdd8c4;
+  --muted: #86a093;
+  --line: #163832;
+  --line-strong: #235347;
+  --accent: #8eb69b;
+  --accent-hover: #daf1de;
+  --accent-text: #051f20;
+  --accent-soft: #163832;
+  --accent-2: #daf1de;
+  --accent-2-soft: #12332d;
+  --ring-3: #235347;
+  --dot: #8eb69b;
   --danger: #ff9b8a;
-  --success: #3fd6c4;
-  --glow-blue: rgba(96, 128, 255, .42);
-  --glow-teal: rgba(45, 212, 191, .30);
+  --success: #8eb69b;
+  --glow-1: rgba(35, 83, 71, .80);
+  --glow-2: rgba(142, 182, 155, .16);
+  --cursor-glow: rgba(142, 182, 155, .14);
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, .3);
   --shadow-md: 0 14px 34px -14px rgba(0, 0, 0, .6);
   color-scheme: dark;
@@ -224,19 +232,31 @@ a:hover { color: var(--accent-hover); }
 .nav__toggle[aria-expanded="true"] .icon--close { display: block; }
 
 /* ---------------------------------------------------------------------
-   6. HERO & SKILLS STRIP
+   6. HERO, SKILLS STRIP & CURSOR GLOW
    --------------------------------------------------------------------- */
+/* The first screen: the hero fills the space under the header and the
+   skills strip sits along its bottom edge, so both show without scrolling. */
+.first-screen {
+  display: flex; flex-direction: column;
+  min-height: calc(100vh - var(--header-h) - 1px);
+  min-height: calc(100svh - var(--header-h) - 1px);
+}
+.first-screen .hero { flex: 1 0 auto; display: flex; align-items: center; }
+.first-screen .marquee { flex: none; }
+
 .hero { position: relative; overflow: hidden; isolation: isolate; }
 .hero__glow { position: absolute; z-index: -1; border-radius: 50%; filter: blur(70px); pointer-events: none; }
-.hero__glow--blue { width: 560px; height: 560px; right: -140px; top: -180px; background: var(--glow-blue); }
-.hero__glow--teal { width: 420px; height: 420px; left: -200px; bottom: -160px; background: var(--glow-teal); }
+.hero__glow--a { width: 560px; height: 560px; right: -140px; top: -180px; background: var(--glow-1); }
+.hero__glow--b { width: 420px; height: 420px; left: -200px; bottom: -160px; background: var(--glow-2); }
 
 .hero__inner {
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(0, .9fr);
   gap: clamp(2rem, 5vw, 4rem);
   align-items: center;
-  padding-block: clamp(3.5rem, 2.5rem + 5vw, 6.5rem);
+  width: 100%;
+  /* vh-based sizes below let the hero shrink on short screens so the skills strip stays in view */
+  padding-block: clamp(1rem, 4.5vh, 5rem);
 }
 
 .badge {
@@ -249,40 +269,44 @@ a:hover { color: var(--accent-hover); }
 .badge__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dot); box-shadow: 0 0 0 4px color-mix(in srgb, var(--dot) 18%, transparent); }
 
 .hero__name {
-  margin-top: 1.25rem;
-  font-size: clamp(2.4rem, 1.6rem + 3.4vw, 3.9rem);
+  margin-top: clamp(.6rem, 2vh, 1.25rem);
+  font-size: clamp(2.1rem, min(1.6rem + 3.4vw, 6.9vh), 3.9rem);
   font-weight: 800;
   letter-spacing: -.035em;
   line-height: 1.05;
 }
-.hero__title { margin-top: .9rem; color: var(--accent); font-weight: 600; font-size: clamp(1rem, .95rem + .3vw, 1.15rem); line-height: 1.5; }
+.hero__title { margin-top: clamp(.45rem, 1.4vh, .9rem); color: var(--accent); font-weight: 600; font-size: clamp(.95rem, min(.95rem + .3vw, 2.3vh), 1.15rem); line-height: 1.5; }
 .hero__tagline {
-  margin-top: 1.25rem;
+  margin-top: clamp(.6rem, 2vh, 1.25rem);
   font-family: var(--font-display);
-  font-size: clamp(1.35rem, 1.1rem + 1.1vw, 1.9rem);
+  font-size: clamp(1.25rem, min(1.1rem + 1.1vw, 3.7vh), 1.9rem);
   font-weight: 700; letter-spacing: -.02em; line-height: 1.3;
   color: var(--text);
 }
+.hero__tagline-lead { display: block; }
+/* The rotating words get a line of their own with a fixed height,
+   so nothing below moves while phrases of different lengths cycle. */
+.typed { display: block; height: 1.3em; white-space: nowrap; }
 .typed__text {
-  background: linear-gradient(90deg, var(--accent), var(--teal));
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
   -webkit-background-clip: text; background-clip: text;
   color: transparent;
 }
 .typed__caret {
   display: inline-block; width: 3px; height: 1.05em; margin-left: 4px;
-  vertical-align: -0.15em; border-radius: 2px; background: var(--teal);
+  vertical-align: -0.15em; border-radius: 2px; background: var(--accent-2);
 }
-.hero__intro { margin-top: 1.1rem; max-width: 56ch; color: var(--muted); font-size: 1.05rem; }
-.hero__actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.9rem; }
-.hero__links { display: flex; gap: 1.25rem; margin-top: 1.4rem; list-style: none; font-size: .95rem; font-weight: 500; }
+.hero__intro { margin-top: clamp(.5rem, 1.7vh, 1.1rem); max-width: 56ch; color: var(--muted); font-size: clamp(.95rem, 2.2vh, 1.05rem); }
+.hero__actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: clamp(.9rem, 3vh, 1.9rem); }
+.hero__links { display: flex; gap: 1.25rem; margin-top: clamp(.6rem, 2vh, 1.4rem); list-style: none; font-size: .95rem; font-weight: 500; }
 .hero__links a { text-decoration: underline; }
 
 /* Portrait with gradient ring and floating tags */
-.portrait { position: relative; margin: 0; justify-self: center; width: min(100%, 330px); aspect-ratio: 1; }
+.portrait { position: relative; margin: 0; justify-self: center; width: min(100%, 330px, 46vh); aspect-ratio: 1; }
 .portrait__ring {
   width: 100%; height: 100%; padding: 7px; border-radius: 50%;
-  background: conic-gradient(from 200deg, var(--accent), var(--teal), #8b7cf6, var(--accent));
-  box-shadow: 0 30px 60px -30px var(--glow-blue);
+  background: conic-gradient(from 200deg, var(--accent), var(--accent-2), var(--ring-3), var(--accent));
+  box-shadow: 0 30px 60px -30px var(--glow-1);
 }
 .portrait__ring img {
   width: 100%; height: 100%; border-radius: 50%;
@@ -296,7 +320,7 @@ a:hover { color: var(--accent-hover); }
   color: var(--accent); font-size: .8rem; font-weight: 700; white-space: nowrap;
 }
 .portrait__tag--1 { top: 6%; right: -4%; }
-.portrait__tag--2 { top: 56%; left: -14%; color: var(--teal); }
+.portrait__tag--2 { top: 56%; left: -14%; color: var(--accent-2); }
 .portrait__tag--3 { bottom: 4%; right: 2%; color: var(--text); }
 
 /* Skills strip */
@@ -311,14 +335,30 @@ a:hover { color: var(--accent-hover); }
 .marquee__group { display: flex; align-items: center; list-style: none; padding: 0; margin: 0; }
 .marquee__group li {
   display: flex; align-items: center; gap: 1.75rem;
-  padding: 1rem 0 1rem 1.75rem;
-  color: var(--text-2); font-weight: 600; font-size: .95rem; white-space: nowrap;
+  padding: .8rem 0 .8rem 1.75rem;
+  color: var(--text-2); font-weight: 600; font-size: .92rem; white-space: nowrap;
 }
 .marquee__group li::after {
   content: ""; width: 12px; height: 12px; flex: none;
   background: var(--accent);
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0l2.6 9.4L24 12l-9.4 2.6L12 24l-2.6-9.4L0 12l9.4-2.6z'/%3E%3C/svg%3E") center / contain no-repeat;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0l2.6 9.4L24 12l-9.4 2.6L12 24l-2.6-9.4L0 12l9.4-2.6z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/* Soft light that follows the mouse (added by script.js; mouse devices only).
+   Change its colour with --cursor-glow, its size with width/height here. */
+.cursor-glow {
+  position: fixed; left: 0; top: 0; z-index: 40;
+  width: 640px; height: 640px; margin: -320px 0 0 -320px;
+  border-radius: 50%;
+  background: radial-gradient(circle closest-side, var(--cursor-glow), transparent);
+  pointer-events: none;
+  opacity: 0; transition: opacity .45s var(--ease);
+  will-change: transform;
+}
+.cursor-glow.is-on { opacity: 1; }
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .cursor-glow { display: none; }
 }
 
 /* ---------------------------------------------------------------------
@@ -329,7 +369,7 @@ a:hover { color: var(--accent-hover); }
 .section__title { font-size: clamp(1.9rem, 1.5rem + 1.6vw, 2.5rem); font-weight: 800; letter-spacing: -.03em; }
 .section__title--bar::after {
   content: ""; display: block; width: 56px; height: 4px; margin-top: .6rem; border-radius: 4px;
-  background: linear-gradient(90deg, var(--accent), var(--teal));
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
 }
 .section__lede { margin-top: .9rem; color: var(--muted); font-size: 1.02rem; }
 .subhead { margin: clamp(3rem, 6vw, 4.5rem) 0 1.5rem; font-size: 1.45rem; font-weight: 800; letter-spacing: -.02em; }
@@ -354,7 +394,7 @@ a:hover { color: var(--accent-hover); }
 .timeline { position: relative; list-style: none; padding-left: 2.25rem; display: grid; gap: 1.5rem; }
 .timeline::before {
   content: ""; position: absolute; left: 6px; top: 8px; bottom: 8px; width: 2px; border-radius: 2px;
-  background: linear-gradient(180deg, var(--accent), var(--teal));
+  background: linear-gradient(180deg, var(--accent), var(--accent-2));
   opacity: .7;
 }
 .job { position: relative; padding: clamp(1.25rem, 3vw, 1.75rem); }
@@ -428,17 +468,17 @@ a:hover { color: var(--accent-hover); }
 .step { padding: 1.35rem 1.35rem 1.4rem; display: flex; flex-direction: column; }
 .step__num {
   display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px;
-  background: linear-gradient(135deg, var(--accent), var(--teal)); color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff;
   font-family: var(--font-display); font-weight: 800; font-size: .95rem;
 }
-[data-theme="dark"] .step__num { color: #0a0e15; }
+[data-theme="dark"] .step__num { color: var(--accent-text); }
 .step__title { margin-top: 1rem; font-size: 1.05rem; font-weight: 700; }
 .step__text { margin-top: .4rem; color: var(--muted); font-size: .92rem; }
 .step__evidence {
   margin-top: 1rem; padding-top: .85rem; border-top: 1px dashed var(--line);
   font-size: .85rem; color: var(--text-2);
 }
-.step__evidence b { display: block; color: var(--teal); font-size: .76rem; font-weight: 700; margin-bottom: .15rem; }
+.step__evidence b { display: block; color: var(--accent-2); font-size: .76rem; font-weight: 700; margin-bottom: .15rem; }
 
 .results { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
 .result { padding: 1.25rem 1.3rem; }
@@ -488,8 +528,8 @@ a:hover { color: var(--accent-hover); }
    12. CASE-STUDY PAGES  (projects/*.html)
    --------------------------------------------------------------------- */
 .case-hero { position: relative; overflow: hidden; isolation: isolate; border-bottom: 1px solid var(--line); }
-.case-hero .hero__glow--blue { width: 460px; height: 460px; top: -220px; }
-.case-hero .hero__glow--teal { width: 340px; height: 340px; bottom: -220px; }
+.case-hero .hero__glow--a { width: 460px; height: 460px; top: -220px; }
+.case-hero .hero__glow--b { width: 340px; height: 340px; bottom: -220px; }
 .case { padding-block: clamp(2rem, 4vw, 3rem) clamp(2.5rem, 5vw, 3.5rem); }
 .case__back { display: inline-flex; align-items: center; gap: .35rem; color: var(--muted); font-size: .9rem; font-weight: 600; text-decoration: none; }
 .case__back:hover { color: var(--accent); }
@@ -532,7 +572,7 @@ a:hover { color: var(--accent-hover); }
 .case-step__note { margin-top: 1rem; color: var(--muted); font-size: .93rem; }
 .case-step__note strong { color: var(--text); }
 .case-step .chips { margin-top: 1rem; }
-.case-step--impact { background: linear-gradient(135deg, var(--accent-soft), var(--teal-soft)); border-color: transparent; }
+.case-step--impact { background: linear-gradient(135deg, var(--accent-soft), var(--accent-2-soft)); border-color: transparent; }
 .case-step--impact p { color: var(--text); font-size: 1.03rem; }
 .case-step--impact .case-step__num { background: var(--accent); color: var(--accent-text); }
 .case__files { margin-top: 1.25rem; display: flex; flex-wrap: wrap; gap: .6rem; }
@@ -593,8 +633,20 @@ a:hover { color: var(--accent-hover); }
   .nav__links a { padding: .75rem .9rem; font-size: 1.02rem; color: var(--text); }
 }
 
+/* Stacked hero (phones, small tablets) or a very short window: the hero is
+   taller than the screen, so the skills strip moves up under the header
+   where it is still visible straight away. */
+@media (max-width: 860px), (max-height: 599px), (max-width: 1100px) and (max-height: 719px) {
+  .first-screen { min-height: 0; }
+  .first-screen .marquee { order: -1; border-top: 0; }
+  .marquee__group li { padding-block: .6rem; font-size: .85rem; }
+}
+/* Safety net set by script.js for any other window size where the hero is too tall */
+.first-screen.is-tall { min-height: 0; }
+.first-screen.is-tall .marquee { order: -1; border-top: 0; }
+
 @media (max-width: 860px) {
-  .hero__inner { grid-template-columns: minmax(0, 1fr); }
+  .hero__inner { grid-template-columns: minmax(0, 1fr); padding-block: 2rem 2.75rem; }
   .portrait { order: -1; width: min(72vw, 260px); justify-self: start; margin-left: 1.5rem; }
   .portrait__tag--2 { left: -10%; }
   .about, .contact { grid-template-columns: minmax(0, 1fr); }
@@ -615,12 +667,13 @@ a:hover { color: var(--accent-hover); }
 }
 
 @media print {
-  .site-header, .marquee, .form, .hero__actions, .case-nav, .toc, .hero__glow { display: none !important; }
+  .site-header, .marquee, .form, .hero__actions, .case-nav, .toc, .hero__glow, .cursor-glow, .typed__caret { display: none !important; }
+  .first-screen { min-height: 0; }
   .js .reveal { opacity: 1 !important; transform: none !important; }
 }
 
 /* Softer hero glow on small screens */
 @media (max-width: 640px) {
-  .hero__glow--blue { width: 360px; height: 360px; right: -180px; top: -160px; opacity: .7; }
-  .hero__glow--teal { width: 300px; height: 300px; left: -200px; bottom: -120px; opacity: .7; }
+  .hero__glow--a { width: 360px; height: 360px; right: -180px; top: -160px; opacity: .7; }
+  .hero__glow--b { width: 300px; height: 300px; left: -200px; bottom: -120px; opacity: .7; }
 }

@@ -25,8 +25,8 @@
   <meta name="twitter:description" content="I turn business problems into operational solutions. Requirements, process improvement and healthcare data analysis.">
   <meta name="twitter:image" content="https://kennyakinwande.github.io/assets/images/og-image.png">
 
-  <meta name="theme-color" content="#f5f7fb" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#0a0d14" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f1f9f2" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#051f20" media="(prefers-color-scheme: dark)">
   <!-- =============================================================== -->
 
   <link rel="icon" href="favicon.ico" sizes="any">
@@ -107,22 +107,26 @@
 
   <main id="main">
 
-    <!-- =============================== HERO =============================== -->
+    <!-- ===================== FIRST SCREEN: hero + skills strip ===================== -->
+    <div class="first-screen">
     <section class="hero" id="home" aria-labelledby="hero-name">
-      <div class="hero__glow hero__glow--blue" aria-hidden="true"></div>
-      <div class="hero__glow hero__glow--teal" aria-hidden="true"></div>
+      <div class="hero__glow hero__glow--a" aria-hidden="true"></div>
+      <div class="hero__glow hero__glow--b" aria-hidden="true"></div>
 
       <div class="container hero__inner">
         <div class="hero__text">
           <!-- EDIT: badge text lives in data.js (heroBadge) -->
-          <p class="badge"><span class="badge__dot" aria-hidden="true"></span><span data-hero="badge">Health Tech Business Analyst · Ontario, Canada</span></p>
+          <p class="badge"><span class="badge__dot" aria-hidden="true"></span><span data-hero="badge">Ontario, Canada</span></p>
 
           <!-- EDIT: name and title -->
           <h1 class="hero__name" id="hero-name">Kehinde (Kenny) Akinwande</h1>
           <p class="hero__title">Health Tech Business Analyst | Project Manager | Data &amp; Process Improvement Analyst</p>
 
-          <!-- EDIT: tagline. The highlighted words are set in data.js (heroTypedText) -->
-          <p class="hero__tagline">I turn business problems into <span class="typed"><span class="typed__text" data-hero="typed">operational solutions.</span><span class="typed__caret" aria-hidden="true"></span></span></p>
+          <!-- EDIT: tagline. The rotating words are set in data.js (heroTypedPhrases) -->
+          <p class="hero__tagline">
+            <span class="hero__tagline-lead">I turn business problems into</span>
+            <span class="typed"><span class="typed__text" data-hero="typed">operational solutions.</span><span class="typed__caret" aria-hidden="true"></span></span>
+          </p>
 
           <!-- EDIT: short description -->
           <p class="hero__intro">
@@ -158,6 +162,7 @@
     <div class="marquee" aria-label="Key skills">
       <div class="marquee__track" data-render="highlights"></div>
     </div>
+    </div><!-- /first-screen -->
 
     <!-- =============================== ABOUT =============================== -->
     <section class="section" id="about" aria-labelledby="about-title">

@@ -78,7 +78,8 @@
     var badge = $('[data-hero="badge"]');
     if (badge) { if (data.heroBadge) badge.textContent = data.heroBadge; else badge.closest(".badge").hidden = true; }
     var typed = $('[data-hero="typed"]');
-    if (typed && data.heroTypedText) typed.textContent = data.heroTypedText;
+    var phrases = typedPhrases();
+    if (typed && phrases.length) typed.textContent = phrases[0];
     $all("[data-hero-tag]").forEach(function (el) {
       var t = (data.heroTags || [])[+el.getAttribute("data-hero-tag")];
       if (t) el.textContent = t; else el.hidden = true;
@@ -188,17 +189,105 @@
     }).join("");
   }
 
-  /* Types out the highlighted words of the tagline once */
+  /* The rotating phrases for the tagline (data.js → heroTypedPhrases) */
+  function typedPhrases() {
+    if (!data) return [];
+    var list = data.heroTypedPhrases;
+    if (!list || !list.length) list = data.heroTypedText ? [data.heroTypedText] : [];
+    return list.filter(function (t) { return t && String(t).trim(); }).map(String);
+  }
+
+  /* Types each phrase, holds it, erases it, then moves to the next one.
+     With one phrase it is typed once and stays. Skipped when the visitor
+     prefers reduced motion: the first phrase is simply shown. */
   function initTyped() {
     var el = $('[data-hero="typed"]');
-    if (!el || reduceMotion) return;
-    var full = el.textContent, i = 0;
+    if (!el) return;
+    var phrases = typedPhrases();
+    if (!phrases.length) phrases = [el.textContent];
+
+    // Screen readers get one steady sentence instead of letter-by-letter changes
+    var box = el.parentNode;
+    var sr = document.createElement("span");
+    sr.className = "visually-hidden";
+    sr.textContent = " " + phrases[0];
+    box.parentNode.insertBefore(sr, box);
+    box.setAttribute("aria-hidden", "true");
+
+    if (reduceMotion) { el.textContent = phrases[0]; return; }
+
+    var TYPE = 55, ERASE = 28, HOLD = 2000, GAP = 380;
+    var index = 0, pos = 0, erasing = false;
     el.textContent = "";
-    el.parentNode.setAttribute("aria-label", full);
     (function tick() {
-      el.textContent = full.slice(0, ++i);
-      if (i < full.length) setTimeout(tick, 55);
+      var full = phrases[index];
+      if (!erasing) {
+        el.textContent = full.slice(0, ++pos);
+        if (pos < full.length) return setTimeout(tick, TYPE);
+        if (phrases.length < 2) return;           // single phrase: stop here
+        erasing = true;
+        return setTimeout(tick, HOLD);
+      }
+      el.textContent = full.slice(0, --pos);
+      if (pos > 0) return setTimeout(tick, ERASE);
+      erasing = false;
+      index = (index + 1) % phrases.length;
+      setTimeout(tick, GAP);
     })();
+  }
+
+  /* =================================================================
+     FIRST SCREEN: keeps the skills strip visible without scrolling.
+     style.css handles the usual screen sizes; this catches the rest by
+     moving the strip under the header when the hero is too tall to fit.
+     ================================================================= */
+  function initFirstScreen() {
+    var wrap = $(".first-screen");
+    if (!wrap) return;
+    var header = $(".site-header"), inner = $(".hero__inner", wrap), strip = $(".marquee", wrap);
+    if (!inner || !strip) return;
+    var queued = false;
+    function fit() {
+      queued = false;
+      var room = window.innerHeight - (header ? header.offsetHeight : 0);
+      wrap.classList.toggle("is-tall", inner.offsetHeight + strip.offsetHeight > room + 1);
+    }
+    function queue() { if (!queued) { queued = true; requestAnimationFrame(fit); } }
+    fit();
+    window.addEventListener("resize", queue);
+    window.addEventListener("load", queue);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(queue);
+  }
+
+  /* =================================================================
+     CURSOR GLOW: a soft light that trails the mouse.
+     Only on devices with a mouse, and off when reduced motion is on.
+     Colour and size are set in style.css (.cursor-glow, --cursor-glow).
+     ================================================================= */
+  function initCursorGlow() {
+    if (reduceMotion || !window.matchMedia) return;
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    var glow = document.createElement("div");
+    glow.className = "cursor-glow";
+    glow.setAttribute("aria-hidden", "true");
+    body.appendChild(glow);
+
+    var x = 0, y = 0, tx = 0, ty = 0, raf = 0, started = false;
+    function frame() {
+      x += (tx - x) * 0.16;
+      y += (ty - y) * 0.16;
+      glow.style.transform = "translate3d(" + x.toFixed(1) + "px," + y.toFixed(1) + "px,0)";
+      raf = (Math.abs(tx - x) > 0.4 || Math.abs(ty - y) > 0.4) ? requestAnimationFrame(frame) : 0;
+    }
+    window.addEventListener("pointermove", function (e) {
+      if (e.pointerType && e.pointerType !== "mouse") return;
+      tx = e.clientX; ty = e.clientY;
+      if (!started) { started = true; x = tx; y = ty; }
+      glow.classList.add("is-on");
+      if (!raf) raf = requestAnimationFrame(frame);
+    }, { passive: true });
+    document.documentElement.addEventListener("mouseleave", function () { glow.classList.remove("is-on"); });
+    window.addEventListener("blur", function () { glow.classList.remove("is-on"); });
   }
 
   /* =================================================================
@@ -241,7 +330,7 @@
 
     mount.innerHTML =
       '<div class="case-hero">' +
-        '<div class="hero__glow hero__glow--blue" aria-hidden="true"></div><div class="hero__glow hero__glow--teal" aria-hidden="true"></div>' +
+        '<div class="hero__glow hero__glow--a" aria-hidden="true"></div><div class="hero__glow hero__glow--b" aria-hidden="true"></div>' +
         '<div class="container case">' +
           '<a class="case__back" href="' + BASE + 'index.html#projects">' +
             '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>All projects</a>' +
@@ -502,6 +591,8 @@
   initTheme();
   initReveal();
   initTyped();
+  initFirstScreen();
+  initCursorGlow();
   initForm();
   $all("[data-year]").forEach(function (el) { el.textContent = new Date().getFullYear(); });
 

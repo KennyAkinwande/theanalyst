@@ -41,10 +41,18 @@ const portfolioData = {
      1b. HERO EXTRAS
      ------------------------------------------------------------------ */
   // Small badge above your name. Change to e.g. "Open to opportunities · Ontario, Canada" if you like.
-  heroBadge: "Health Tech Business Analyst · Ontario, Canada",
+  heroBadge: "Ontario, Canada",
 
-  // The words typed out at the end of your tagline ("I turn business problems into ...")
-  heroTypedText: "operational solutions.",
+  // The words that type, hold, erase and rotate after "I turn business problems into ..."
+  // Keep every phrase between about 16 and 22 characters so each one fits on a single
+  // line on a phone. Add, remove or reorder freely; a single phrase is typed once and stays.
+  heroTypedPhrases: [
+    "operational solutions.",
+    "scalable workflows.",
+    "data-driven outcomes.",
+    "clinical efficiency.",
+    "measurable impact."
+  ],
 
   // Three tags that float around your photo
   heroTags: ["Business Analysis", "Data & Process Improvement", "Project Management"],

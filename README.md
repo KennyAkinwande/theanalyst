@@ -80,7 +80,7 @@ Almost everything is in **one file: `assets/js/data.js`**. Open it in any text e
 | What you want to change | Where |
 |---|---|
 | Name, title, tagline, short intro | `index.html`: the **HERO** section (search for `EDIT:`) |
-| Badge above your name, typed tagline words, tags around your photo | `data.js` → `heroBadge`, `heroTypedText`, `heroTags` |
+| Badge above your name, rotating tagline phrases, tags around your photo | `data.js` → `heroBadge`, `heroTypedPhrases`, `heroTags` |
 | Scrolling skills strip under the hero | `data.js` → `highlights` |
 | Stat cards beside About (4+, 300+…) | `data.js` → `aboutStats` |
 | About text | `index.html`: the **ABOUT** section |
@@ -164,10 +164,35 @@ Open `assets/css/style.css` and find **section 2, DESIGN TOKENS**.
 
 - `:root { … }` holds the **light** theme colours.
 - `[data-theme="dark"] { … }` holds the **dark** theme colours.
-- `--accent` is the blue used for buttons, links and highlights, and `--teal` is the second accent. Change them in both themes.
+- The palette is six greens: `#051F20`, `#0B2B26`, `#163832`, `#235347`, `#8EB69B`, `#DAF1DE`. The lighter page background, borders and
+  quiet text are tints blended from them.
+- `--accent` is the green used for buttons, links and highlights (`#235347` in light mode, `#8EB69B` in dark mode), and `--accent-2` is the second accent. Change them in both themes.
   Keep enough contrast; <https://webaim.org/resources/contrastchecker/> will tell you if text is readable.
+- `--glow-1` and `--glow-2` are the two soft colour washes behind the hero, `--ring-3` is the third colour in the ring around your photo,
+  and `--cursor-glow` is the light that follows the mouse.
+- The project cover images, the sharing image (`og-image.png`) and the favicon are pictures, so they do not follow these values.
+  If you change the palette again, recolour or replace those files too.
 
 The theme follows the visitor's device setting on their first visit. The moon/sun button switches it, and the choice is remembered.
+
+### The rotating tagline
+
+The words after "I turn business problems into" type, hold, erase and move on to the next phrase.
+Edit the list in `assets/js/data.js` → `heroTypedPhrases`. Keep each phrase to roughly 16 to 22 characters:
+the phrases sit on a line of their own with a fixed height, so the page never shifts as they change,
+but a much longer phrase would be cut off on a narrow phone. With a single phrase in the list it is typed once and stays.
+
+### The light that follows the mouse
+
+A soft glow trails the mouse pointer on desktop. It is switched off on touch screens and for visitors who ask their
+device for reduced motion. Its colour is `--cursor-glow` (section 2 of `style.css`) and its size is the `width` / `height`
+of `.cursor-glow` (section 6). To remove it, delete the `initCursorGlow();` line near the bottom of `assets/js/script.js`.
+
+### The skills strip in the first screen
+
+The hero and the scrolling skills strip together fill the first screen, with the strip along the bottom edge.
+Text sizes in the hero shrink a little on short laptop screens to keep it there. On phones, where the hero is taller
+than the screen, the strip sits directly under the header instead so it is still visible without scrolling.
 
 ## 10. Change the fonts
 
@@ -182,7 +207,7 @@ The `<link rel="preload">` lines in the `<head>` of `index.html` and the project
 
 ## 11. Favicon
 
-`favicon.ico` (root) and `assets/images/favicon-32.png` / `apple-touch-icon.png` show a blue "K" monogram.
+`favicon.ico` (root) and `assets/images/favicon-32.png` / `apple-touch-icon.png` show a green "K" monogram.
 To replace it, create your own at <https://realfavicongenerator.net> and overwrite those three files with the same names.
 
 ---
